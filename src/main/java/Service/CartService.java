@@ -33,7 +33,7 @@ public class CartService extends EntityUtil<Cart> {
     public void addItemToCart(CartItem cartItem,@HeaderParam("token")String token){
 
 
-                if(securityFilter.isValid(token)){
+                if(securityFilter.isVerified(token)){
                     String email=securityFilter.getIssuer(token);
 
                     UserAccount user= userAccountService.findByEmail(email);
@@ -83,7 +83,6 @@ public class CartService extends EntityUtil<Cart> {
     @Produces(MediaType.APPLICATION_JSON)
     public List<CartItem> getAll(@HeaderParam("token")String token){
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
-
         return super.datasourceConnector.getDatastore().find(Cart.class)
                 .field("accountID").equal(userID).get().getItems();
 
@@ -141,8 +140,6 @@ public class CartService extends EntityUtil<Cart> {
     @Produces(MediaType.APPLICATION_JSON)
     public double total(@HeaderParam("token") String token){
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
-
-
         Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();
         double amount = 0;
         List<CartItem> myListOfCartItems=cart.getItems();

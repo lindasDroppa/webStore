@@ -2,12 +2,12 @@ package Control;
 
 import io.jsonwebtoken.*;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 
 public class SecurityFilter
 {
-
-
 
     public SecurityFilter() {
     }
@@ -49,16 +49,10 @@ public class SecurityFilter
         return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getIssuer();
     }
 
-    /**
-     * @param token 
-     * @return
-     */
-    public boolean isValid(String token){
+    public boolean isVerified(String token){
 
         try {
             Jwt jjwts=   Jwts.parser().setSigningKey(key).parse(token);
-
-
 
             return jjwts!=null;
 
