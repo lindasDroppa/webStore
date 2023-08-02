@@ -7,6 +7,8 @@ import io.jsonwebtoken.*;
 public class SecurityFilter
 {
 
+
+
     public SecurityFilter() {
     }
 
@@ -15,7 +17,6 @@ public class SecurityFilter
     public String createJWTToken(String email,String password){
 
         String jws = Jwts.builder().setSubject(password)
-
                 .setIssuer(email)
                 .signWith(SignatureAlgorithm.HS256,key).compact();
 
@@ -39,21 +40,25 @@ public class SecurityFilter
 
     }
 
-    public String email(String token){
-
-        String y=verifyJWTToken(token);
-
-        String[] stylist=y.split("iss=");
-
-        String stringEmail=stylist[1].substring(0,stylist[1].length()-1);
-
-        return stringEmail;
+    public String getSubject(String token){
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public boolean isVerified(String token){
+
+    public String getIssuer(String token){
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getIssuer();
+    }
+
+    /**
+     * @param token 
+     * @return
+     */
+    public boolean isValid(String token){
 
         try {
             Jwt jjwts=   Jwts.parser().setSigningKey(key).parse(token);
+
+
 
             return jjwts!=null;
 
@@ -64,6 +69,8 @@ public class SecurityFilter
 
     }
     public String encryptPassword(String password){
+
+
         return null;
     }
 

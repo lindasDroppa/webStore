@@ -33,8 +33,8 @@ public class CartService extends EntityUtil<Cart> {
     public void addItemToCart(CartItem cartItem,@HeaderParam("token")String token){
 
 
-                if(securityFilter.isVerified(token)){
-                    String email=securityFilter.email(token);
+                if(securityFilter.isValid(token)){
+                    String email=securityFilter.getIssuer(token);
 
                     UserAccount user= userAccountService.findByEmail(email);
 
@@ -82,7 +82,8 @@ public class CartService extends EntityUtil<Cart> {
     @Path("get")
     @Produces(MediaType.APPLICATION_JSON)
     public List<CartItem> getAll(@HeaderParam("token")String token){
-        String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+        String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
         return super.datasourceConnector.getDatastore().find(Cart.class)
                 .field("accountID").equal(userID).get().getItems();
 
@@ -91,7 +92,7 @@ public class CartService extends EntityUtil<Cart> {
     @POST
     @Path("remove/{productId}")
     public Response remove(@PathParam("productId") String productId,@HeaderParam("token")String token){
-        String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+        String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
         boolean removed=false;
         Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();
@@ -139,7 +140,8 @@ public class CartService extends EntityUtil<Cart> {
     @Path("total")
     @Produces(MediaType.APPLICATION_JSON)
     public double total(@HeaderParam("token") String token){
-        String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+        String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
 
         Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();
         double amount = 0;
