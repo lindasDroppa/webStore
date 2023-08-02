@@ -3,12 +3,14 @@ package Service;
 import Control.SecurityFilter;
 import Entities.Product;
 
+import Entities.UserAccount;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,7 +33,7 @@ public class ProductService extends EntityUtil<Product>
     @Produces(MediaType.APPLICATION_JSON)
     public void create(Product entity, @HeaderParam("token") String token) {
 
-        if(securityFilter.isValid(token)){
+        if(securityFilter.isVerified(token)){
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
             entity.setUserAccountID(userID);
@@ -56,7 +58,7 @@ public class ProductService extends EntityUtil<Product>
         @Path("remove")
         @Consumes(MediaType.APPLICATION_JSON)
         public void remove (String productID, @HeaderParam("token") String token){
-            if (securityFilter.isValid(token)) {
+            if (securityFilter.isVerified(token)) {
             super.remove(productID);
             }
 
@@ -74,7 +76,7 @@ public class ProductService extends EntityUtil<Product>
        @Produces(MediaType.APPLICATION_JSON)
         public List<Product> mySellingProduct(@HeaderParam("token")String token){
 
-        if(securityFilter.isValid(token)){
+        if(securityFilter.isVerified(token)){
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
 
@@ -94,7 +96,7 @@ public class ProductService extends EntityUtil<Product>
     @Produces(MediaType.APPLICATION_JSON)
     public List<Product> availableToShop(@HeaderParam("token")String token){
 
-        if(securityFilter.isValid(token)){
+        if(securityFilter.isVerified(token)){
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
 

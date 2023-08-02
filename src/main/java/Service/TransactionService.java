@@ -99,7 +99,7 @@ public class TransactionService extends EntityUtil<Transaction>
     @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Transaction> allMyTransaction(@HeaderParam("token") String token){
-        if (securityFilter.isValid(token)){
+        if (securityFilter.isVerified(token)){
 
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
@@ -118,7 +118,7 @@ public class TransactionService extends EntityUtil<Transaction>
     @Path("as/customer")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Transaction> customer(@HeaderParam("token") String token){
-        if (securityFilter.isValid(token)){
+        if (securityFilter.isVerified(token)){
 
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
@@ -134,7 +134,7 @@ public class TransactionService extends EntityUtil<Transaction>
     @Path("as/owner")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Transaction> productOwner(@HeaderParam("token") String token){
-        if (securityFilter.isValid(token)){
+        if (securityFilter.isVerified(token)){
 
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
