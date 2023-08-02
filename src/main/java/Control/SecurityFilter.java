@@ -2,6 +2,8 @@ package Control;
 
 import io.jsonwebtoken.*;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 
 public class SecurityFilter
@@ -15,7 +17,6 @@ public class SecurityFilter
     public String createJWTToken(String email,String password){
 
         String jws = Jwts.builder().setSubject(password)
-
                 .setIssuer(email)
                 .signWith(SignatureAlgorithm.HS256,key).compact();
 
@@ -39,15 +40,13 @@ public class SecurityFilter
 
     }
 
-    public String email(String token){
+    public String getSubject(String token){
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject();
+    }
 
-        String y=verifyJWTToken(token);
 
-        String[] stylist=y.split("iss=");
-
-        String stringEmail=stylist[1].substring(0,stylist[1].length()-1);
-
-        return stringEmail;
+    public String getIssuer(String token){
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getIssuer();
     }
 
     public boolean isVerified(String token){
@@ -64,6 +63,8 @@ public class SecurityFilter
 
     }
     public String encryptPassword(String password){
+
+
         return null;
     }
 

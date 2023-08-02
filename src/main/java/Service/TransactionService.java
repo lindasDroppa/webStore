@@ -36,9 +36,10 @@ public class TransactionService extends EntityUtil<Transaction>
         Transaction transaction=new Transaction();
 
 
-        String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+        String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
-       List<CartItem> myCartList= cartService.getAll(token);
+
+        List<CartItem> myCartList= cartService.getAll(token);
 
         for (int i  = 0 ; i < myCartList.size() ; i++){
             //Get the cartItem in the cart
@@ -100,9 +101,10 @@ public class TransactionService extends EntityUtil<Transaction>
     public List<Transaction> allMyTransaction(@HeaderParam("token") String token){
         if (securityFilter.isVerified(token)){
 
-            String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
-         return    datasourceConnector.getDatastore().createQuery(Transaction.class).filter("customerID",userID).filter("productOwnerID",userID) .asList();
+
+            return    datasourceConnector.getDatastore().createQuery(Transaction.class).filter("customerID",userID).filter("productOwnerID",userID) .asList();
        //    return super.datasourceConnector.getDatastore().find(Transaction.class).filter("productOwnerID",userID).filter( "customerID",userID).asList();
 //            return super.datasourceConnector.getDatastore().find(Transaction.class).field(
 //                    "productOwnerID").equal(userID).asList();
@@ -118,7 +120,8 @@ public class TransactionService extends EntityUtil<Transaction>
     public List<Transaction> customer(@HeaderParam("token") String token){
         if (securityFilter.isVerified(token)){
 
-            String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
 
             return    datasourceConnector.getDatastore().createQuery(Transaction.class).filter("customerID",userID).asList();
 
@@ -133,7 +136,8 @@ public class TransactionService extends EntityUtil<Transaction>
     public List<Transaction> productOwner(@HeaderParam("token") String token){
         if (securityFilter.isVerified(token)){
 
-            String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
 
             return    datasourceConnector.getDatastore().createQuery(Transaction.class).filter("productOwnerID",userID).asList();
 

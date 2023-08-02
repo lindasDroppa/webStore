@@ -34,8 +34,9 @@ public class ProductService extends EntityUtil<Product>
     public void create(Product entity, @HeaderParam("token") String token) {
 
         if(securityFilter.isVerified(token)){
-           String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
-           entity.setUserAccountID(userID);
+            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
+            entity.setUserAccountID(userID);
            super.create(entity);
         }else{
             throw new NotAuthorizedException("User not authorized");
@@ -76,7 +77,8 @@ public class ProductService extends EntityUtil<Product>
         public List<Product> mySellingProduct(@HeaderParam("token")String token){
 
         if(securityFilter.isVerified(token)){
-            String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
 
             return  super.datasourceConnector.getDatastore().find(Product.class).field(
                     "userAccountID").equal(userID).asList();
@@ -95,7 +97,8 @@ public class ProductService extends EntityUtil<Product>
     public List<Product> availableToShop(@HeaderParam("token")String token){
 
         if(securityFilter.isVerified(token)){
-            String userID= userAccountService.findByEmail(securityFilter.email(token)).getId().toString();
+            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+
 
             return  super.datasourceConnector.getDatastore().find(Product.class).field(
                     "userAccountID").notEqual(userID).asList();
