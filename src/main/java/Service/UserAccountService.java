@@ -14,6 +14,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +39,18 @@ public class UserAccountService extends EntityUtil<UserAccount>
     @POST
     @Path("create")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(UserAccount userAccount){
+    public Response create(UserAccount userAccount) {
 
         if(!userExist(userAccount.getEmail())){
+            String unencryptedPassword= userAccount.getPassword();
+
+            try {
+                userAccount.setPassword(securityFilter.encrypt(unencryptedPassword));
+            }catch (Exception e){
+                return Response.status(100).build();
+            }
+
+
             super.create(userAccount);
 
             //Get the user by email
@@ -82,9 +92,15 @@ public class UserAccountService extends EntityUtil<UserAccount>
     @Consumes(MediaType.APPLICATION_JSON)
     public LoginSuccess login(@QueryParam("email") String email,@QueryParam("password") String password){
 
-
+        String decryptedPasword=null;
         UserAccount loginUser= findByEmail(email);
-        if(loginUser.getPassword().equals(password)){
+        try {
+            decryptedPasword= securityFilter.decrypt(loginUser.getPassword());
+        }catch (Exception ex){
+            throw new RuntimeException();
+        }
+
+        if( decryptedPasword.equals(password)){
             String token = securityFilter.createJWTToken(email,password);
 
 

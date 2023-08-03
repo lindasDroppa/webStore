@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Path("transaction")
+@Produces(MediaType.APPLICATION_JSON)
 public class TransactionService extends EntityUtil<Transaction>
 {
 
@@ -31,7 +32,6 @@ public class TransactionService extends EntityUtil<Transaction>
 
     @POST
     @Path("create")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response create(@HeaderParam("token")String token) {
         Transaction transaction=new Transaction();
 
@@ -97,7 +97,6 @@ public class TransactionService extends EntityUtil<Transaction>
 
     @GET
     @Path("all")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Transaction> allMyTransaction(@HeaderParam("token") String token){
         if (securityFilter.isVerified(token)){
 
@@ -116,7 +115,6 @@ public class TransactionService extends EntityUtil<Transaction>
 
     @GET
     @Path("as/customer")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Transaction> customer(@HeaderParam("token") String token){
         if (securityFilter.isVerified(token)){
 
@@ -132,7 +130,6 @@ public class TransactionService extends EntityUtil<Transaction>
 
     @GET
     @Path("as/owner")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Transaction> productOwner(@HeaderParam("token") String token){
         if (securityFilter.isVerified(token)){
 

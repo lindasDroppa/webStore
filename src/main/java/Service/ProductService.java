@@ -16,6 +16,7 @@ import java.util.List;
 
 @Path("product")
 @Stateless
+@Produces(MediaType.APPLICATION_JSON)
 public class ProductService extends EntityUtil<Product>
 {
 
@@ -30,7 +31,6 @@ public class ProductService extends EntityUtil<Product>
 
     @POST
     @Path("create")
-    @Produces(MediaType.APPLICATION_JSON)
     public void create(Product entity, @HeaderParam("token") String token) {
 
         if(securityFilter.isVerified(token)){
@@ -66,14 +66,12 @@ public class ProductService extends EntityUtil<Product>
 
        @GET
        @Path("find/{id}")
-       @Produces(MediaType.APPLICATION_JSON)
         public Product find(@PathParam("id") String productID){
         return super.find(productID);
        }
 
        @GET
        @Path("selling")
-       @Produces(MediaType.APPLICATION_JSON)
         public List<Product> mySellingProduct(@HeaderParam("token")String token){
 
         if(securityFilter.isVerified(token)){
@@ -93,7 +91,6 @@ public class ProductService extends EntityUtil<Product>
 
     @GET
     @Path("store")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Product> availableToShop(@HeaderParam("token")String token){
 
         if(securityFilter.isVerified(token)){

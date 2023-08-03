@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Path("cart")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class CartService extends EntityUtil<Cart> {
     public CartService() {
         super(Cart.class);
@@ -29,7 +31,6 @@ public class CartService extends EntityUtil<Cart> {
 
     @POST
     @Path("add/item")
-    @Consumes(MediaType.APPLICATION_JSON)
     public void addItemToCart(CartItem cartItem,@HeaderParam("token")String token){
 
 
@@ -80,7 +81,7 @@ public class CartService extends EntityUtil<Cart> {
 
     @GET
     @Path("get")
-    @Produces(MediaType.APPLICATION_JSON)
+
     public List<CartItem> getAll(@HeaderParam("token")String token){
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
         return super.datasourceConnector.getDatastore().find(Cart.class)
@@ -137,7 +138,6 @@ public class CartService extends EntityUtil<Cart> {
 
     @GET
     @Path("total")
-    @Produces(MediaType.APPLICATION_JSON)
     public double total(@HeaderParam("token") String token){
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
         Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();

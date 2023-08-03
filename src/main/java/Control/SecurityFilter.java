@@ -2,8 +2,11 @@ package Control;
 
 import io.jsonwebtoken.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 
 public class SecurityFilter
@@ -62,14 +65,25 @@ public class SecurityFilter
 
 
     }
-    public String encryptPassword(String password){
+    private static final String ALGORITHM = "AES";
+    private static final String KEY_VALUE = "1Hbfh667adfDEJ78";
 
 
-        return null;
+    public  String encrypt(String value) throws Exception {
+        SecretKeySpec keySpec = new SecretKeySpec(KEY_VALUE.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+        byte[] encryptedValue = cipher.doFinal(value.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedValue);
     }
 
-    public String decryptPassword(String password){
-        return null;
+    public  String decrypt(String value) throws Exception {
+        SecretKeySpec keySpec = new SecretKeySpec(KEY_VALUE.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, keySpec);
+        byte[] decodedValue = Base64.getDecoder().decode(value.getBytes());
+        byte[] decryptedValue = cipher.doFinal(decodedValue);
+        return new String(decryptedValue);
     }
 
 
