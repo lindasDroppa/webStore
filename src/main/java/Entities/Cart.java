@@ -44,6 +44,7 @@ public class Cart {
 
     public void setItems(List<CartItem> items) {
         this.items = items;
+
     }
 
     public double getTotal() {

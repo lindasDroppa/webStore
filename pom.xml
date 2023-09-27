@@ -262,7 +262,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
-                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <artifactId>wildfly-arquillian-parent</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -271,7 +271,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>${version.failsafe.plugin}</version>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -283,6 +283,7 @@
                         <configuration>
                             <!-- Configuration for Arquillian: -->
                             <systemPropertyVariables>
+                                <property name="cors.webStore" value="http://localhost:4200/"/>
                                 <!-- Defines the container qualifier in "arquillian.xml" -->
                                 <arquillian.launch>managed</arquillian.launch>
                             </systemPropertyVariables>
@@ -299,7 +300,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
-                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <artifactId>wildfly-arquillian-parent</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -308,7 +309,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>${version.failsafe.plugin}</version>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -318,8 +319,10 @@
                             </execution>
                         </executions>
                         <configuration>
+
                             <!-- Configuration for Arquillian: -->
                             <systemPropertyVariables>
+                                <filtering>true</filtering>
                                 <!-- Defines the container qualifier in "arquillian.xml" -->
                                 <arquillian.launch>remote</arquillian.launch>
                             </systemPropertyVariables>

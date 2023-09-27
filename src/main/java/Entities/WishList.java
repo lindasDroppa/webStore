@@ -1,4 +1,6 @@
 package Entities;
 
-public class WishList {
+public class WishList
+{
+
 }

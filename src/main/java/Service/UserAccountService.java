@@ -2,6 +2,7 @@ package Service;
 
 
 
+import Control.LoginDTO;
 import Control.LoginSuccess;
 import Control.SecurityFilter;
 import Entities.Cart;
@@ -77,11 +78,11 @@ public class UserAccountService extends EntityUtil<UserAccount>
             walletService.create(wallet);
 
 
-            return Response.status(101).build();
+            return Response.ok("CRT").build();
         }
         else
         {
-         throw  new NotAuthorizedException(userAccount);
+            return Response.ok("NCRT").build();
         }
 
     }
@@ -90,18 +91,25 @@ public class UserAccountService extends EntityUtil<UserAccount>
     @Path("login")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public LoginSuccess login(@QueryParam("email") String email,@QueryParam("password") String password){
+    public Response loginUser(LoginDTO loginDTO){
+        return Response.ok(login(loginDTO)).build();
+    }
+
+
+
+
+    public LoginSuccess login(LoginDTO loginDTO){
 
         String decryptedPasword=null;
-        UserAccount loginUser= findByEmail(email);
+        UserAccount loginUser= findByEmail(loginDTO.getEmail());
         try {
             decryptedPasword= securityFilter.decrypt(loginUser.getPassword());
         }catch (Exception ex){
             throw new RuntimeException();
         }
 
-        if( decryptedPasword.equals(password)){
-            String token = securityFilter.createJWTToken(email,password);
+        if( decryptedPasword.equals(loginDTO.getPassword())){
+            String token = securityFilter.createJWTToken(loginDTO.getEmail(),loginDTO.getPassword());
 
 
 
@@ -169,6 +177,21 @@ public class UserAccountService extends EntityUtil<UserAccount>
         }
         return null;
     }
+    @Path("by/token")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public UserAccount getByToken(@HeaderParam("token")String token){
+
+        System.out.println(":---------------------------"+token);
+        if(securityFilter.isVerified(token)){
+            System.out.println("================================================================================="+findByEmail(securityFilter.getIssuer(token)).getEmail());
+            return findByEmail(securityFilter.getIssuer(token));
+        }else{
+            throw new NotAuthorizedException(Response.status(401).build());
+        }
+    }
+
 
 
 

@@ -1,14 +1,21 @@
 package Service;
 
 import Control.SecurityFilter;
+import DTOs.ProductDTO;
+import DTOs.RemoveRequest;
 import Entities.Cart;
 import Entities.CartItem;
+import Entities.Product;
 import Entities.UserAccount;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +38,19 @@ public class CartService extends EntityUtil<Cart> {
 
     @POST
     @Path("add/item")
-    public void addItemToCart(CartItem cartItem,@HeaderParam("token")String token){
+    public Response addItemtoCart(CartItem cartItem,@HeaderParam("token")String token){
+        System.out.println("===================="+cartItem.toString());
+        System.out.println("token=================================:"+token);
+        addItemToCart(cartItem,token);
+        return Response.ok().build();
+    }
+
+
+
+
+
+
+    private void addItemToCart(CartItem cartItem,String token){
 
 
                 if(securityFilter.isVerified(token)){
@@ -71,6 +90,7 @@ public class CartService extends EntityUtil<Cart> {
 
 
                   super.edit(cart);
+
                   total(token);
 
 
@@ -79,28 +99,48 @@ public class CartService extends EntityUtil<Cart> {
                 }
     }
 
-    @GET
-    @Path("get")
 
-    public List<CartItem> getAll(@HeaderParam("token")String token){
+
+    public List<CartItem> getAll(String token){
+        System.out.println("token=================================:"+token);
+
+
+
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
         return super.datasourceConnector.getDatastore().find(Cart.class)
                 .field("accountID").equal(userID).get().getItems();
 
     }
+    @GET
+    @Path("get/products")
+    public Response getAllProduct(@HeaderParam("token")String token){
+        return Response.ok(allP(token)).build();
+    }
+    private  List<ProductDTO> allP(String token){
+        List<CartItem> getAll=getAll(token);
+        List<ProductDTO> myProductDTOList=new ArrayList<>();
+        if (getAll!=null){
+            for (int i =0 ;i<getAll.size();i++){
+                ProductDTO product=productService.findDTO(getAll.get(i).getProductId());
+                product.qtyCart=getAll.get(i).getNumberOfProduct();
+                myProductDTOList.add(product);
+            }
+        }
 
+
+        return myProductDTOList;
+    }
     @POST
-    @Path("remove/{productId}")
-    public Response remove(@PathParam("productId") String productId,@HeaderParam("token")String token){
+    @Path("remove")
+    public Response remove(RemoveRequest removeRequest, @HeaderParam("token")String token){
+        System.out.println("token=================================:"+token);
+        String productId=removeRequest.getProductId();
+        System.out.println("Removing from cart ID :"+productId);
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
 
         boolean removed=false;
         Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();
         List<CartItem> myListOfCartItems=cart.getItems();
-
-
-        System.out.println(cart.getId().toString());
-
 
         for (int i = 0 ; i< myListOfCartItems.size() ; i++){
 
@@ -138,21 +178,52 @@ public class CartService extends EntityUtil<Cart> {
 
     @GET
     @Path("total")
-    public double total(@HeaderParam("token") String token){
+    public Response total(@HeaderParam("token") String token){
+        return Response.ok(getCartT(token)).build();
+    }
+    private double getCartT(String token){
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
         Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();
         double amount = 0;
-        List<CartItem> myListOfCartItems=cart.getItems();
-        if(myListOfCartItems!=null||myListOfCartItems.size()!=0){
-            for (int i = 0 ;  i< myListOfCartItems.size() ; i++){
-
-
-                amount=amount+ productService.find(myListOfCartItems.get(i).getProductId()).getPrice();
+        if(cart!=null){
+            List<CartItem> myListOfCartItems=cart.getItems();
+            if(myListOfCartItems==null){
+                return 0;
             }
+            if(myListOfCartItems!=null||myListOfCartItems.size()!=0){
+                for (int i = 0 ;  i< myListOfCartItems.size() ; i++){
+
+
+                    amount=amount+ productService.find(myListOfCartItems.get(i).getProductId()).getPrice();
+                }
+            }
+            cart.setTotal(amount);
+            super.edit(cart);
+            return amount;
+        }else{
+            return 0;
         }
-        cart.setTotal(amount);
-        super.edit(cart);
-        return amount;
+
+    }
+
+    @POST
+    @Path("clear")
+        public Response clearCart(@HeaderParam("token") String token){
+        String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();
+        Cart cart=super.datasourceConnector.getDatastore().find(Cart.class).field("accountID").equal(userID).get();
+        cart=new Cart();
+        cart.setAccountID(userID);
+        create(cart);
+    return Response.ok().build();
+
+    }
+
+    @GET
+    @Path("size")
+    public Response getCartSize(@HeaderParam("token") String token){
+
+        System.out.println("User :"+userAccountService.findByEmail(securityFilter.getIssuer(token)).getEmail());
+        return Response.ok(allP(token).size()).build();
     }
 
 

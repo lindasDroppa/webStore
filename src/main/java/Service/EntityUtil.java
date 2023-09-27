@@ -39,7 +39,9 @@ public abstract class EntityUtil<T>
 
         T t= datasourceConnector.getDatastore().find(entityClass).field("_id").equal(new ObjectId(id)).get();
         if(t!=null){
+            System.out.println("Found ;+++++++++++++++"+t);
             return t;
+
         }else{
             throw new BadRequestException();
         }

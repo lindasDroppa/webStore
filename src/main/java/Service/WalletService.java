@@ -25,7 +25,7 @@ public class WalletService extends EntityUtil<Wallet>
     @POST
     @Path("deposit/{amount}")
     public void toUpWallet(@PathParam("amount") double amount, @HeaderParam("token")String token){
-
+        System.out.println("token=================================:"+token);
         if(securityFilter.isVerified(token)){//Verify token
            String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();//Get user id using the token
            addAmount(userID,amount);//add the amount
@@ -36,6 +36,7 @@ public class WalletService extends EntityUtil<Wallet>
     @GET
     @Path("balance")
     public double balance(@HeaderParam("token")String token){
+        System.out.println("token=================================:"+token);
         String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();//Get user id using the token
         return super.datasourceConnector.getDatastore().find(Wallet.class)
                 .field("userAccountID").equal(userID).get().getBalance();//find and return the balance
@@ -44,6 +45,7 @@ public class WalletService extends EntityUtil<Wallet>
     @GET
     @Path("withdraw/{amount}")
     public Response withdrew(@PathParam("amount")double amount,@HeaderParam("token")String token){
+        System.out.println("token=================================:"+token);
         if(securityFilter.isVerified(token)){//verify token
             String userID= userAccountService.findByEmail(securityFilter.getIssuer(token)).getId().toString();//Get user id using the token
             Wallet wallet= super.datasourceConnector.getDatastore().find(Wallet.class)

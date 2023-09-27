@@ -1,6 +1,7 @@
 package Service;
 
 import Control.SecurityFilter;
+import DTOs.RemoveRequest;
 import Entities.CartItem;
 import Entities.Product;
 import Entities.Transaction;
@@ -33,6 +34,7 @@ public class TransactionService extends EntityUtil<Transaction>
     @POST
     @Path("create")
     public Response create(@HeaderParam("token")String token) {
+        System.out.println("token=================================:"+token);
         Transaction transaction=new Transaction();
 
 
@@ -73,7 +75,7 @@ public class TransactionService extends EntityUtil<Transaction>
                     product.setQty(product.getQty()-cartItem.getNumberOfProduct());
                     productService.edit(product);
 
-                    cartService.remove(cartItem.getProductId(),token);
+                    cartService.remove(new RemoveRequest(cartItem.getProductId()),token);
 
                     super.create(transaction);//create a transaction
                     return Response.status(200).build();
